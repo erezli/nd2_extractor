@@ -6,7 +6,7 @@ Run the following commands
 
 `jupyter nbextension enable --py widgetsnbextension`
 
-Then launch `nd2_extractor_interactive.ipynb` in a Jupyter notebook (Not Jupyter Lab)
+Then launch `nd2_extractor_interactive.ipynb` in a Jupyter notebook (Not Jupyter Lab because progress bars will look wrong)
 
 
 
