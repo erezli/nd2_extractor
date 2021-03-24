@@ -8,3 +8,5 @@ celluloid
 colorama
 termcolor
 tqdm
+joblib
+ipywidgets
