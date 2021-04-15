@@ -10,3 +10,6 @@ termcolor
 tqdm
 joblib
 ipywidgets
+tifffile
+pandas
+pystackreg
