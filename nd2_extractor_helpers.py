@@ -55,7 +55,7 @@ def save_image(frame, i, img_format,save_directory,FOV,IMG_CHANNELS,channel):
 
         
         
-def main_loop(directory,save_directory):
+def main_loop(directory,save_directory, joblib_workers):
     if save_directory[-1] != "/":
         save_directory = save_directory + "/"
     # Get parameters of the experiment
@@ -112,10 +112,10 @@ def main_loop(directory,save_directory):
     FOVs_list = list(range(num_FOVs))
     CHANNELS_list = list(range(IMG_CHANNELS_COUNT))
     
-    if img_format == "PNG":
-        joblib_workers = -1
-    else:
-        joblib_workers = 500
+    #if img_format == "PNG":
+    #    joblib_workers = 200
+    #else:
+    #    joblib_workers = 500
 
     with ND2Reader_SDK(directory) as frames:
         for FOV in tqdm(FOVs_list, desc = "Overall (FOV) progress"):
