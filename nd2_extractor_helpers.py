@@ -119,13 +119,13 @@ def main_loop(directory,save_directory, joblib_workers):
 
     with ND2Reader_SDK(directory) as frames:
         for FOV in tqdm(FOVs_list, desc = "Overall (FOV) progress"):
-            for channel in tqdm(CHANNELS_list, desc = "Channel progress in FOV {}".format(FOV), leave = False):
+            for channel in tqdm(CHANNELS_list, desc = "Channel progress in FOV {}".format(FOV), leave = False, position = 1):
                 frames.iter_axes = 't'
                 try:
                     frames.default_coords['c'] = channel
                 except:
                     pass
                 frames.default_coords['m'] = FOV
-                Parallel(prefer="threads", n_jobs = joblib_workers)(delayed(save_image)(frames[i], i, img_format,save_directory,FOV,IMG_CHANNELS,channel) for i in tqdm(range(num_t), desc = "Frame progress in channel {}".format(IMG_CHANNELS[channel]), leave = False) )
+                Parallel(prefer="threads", n_jobs = joblib_workers)(delayed(save_image)(frames[i], i, img_format,save_directory,FOV,IMG_CHANNELS,channel) for i in tqdm(range(num_t), desc = "Frame progress in channel {}".format(IMG_CHANNELS[channel]), leave = False, position = 2) )
 
  
