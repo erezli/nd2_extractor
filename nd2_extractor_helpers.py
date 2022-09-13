@@ -5,6 +5,7 @@ pp = pprint.PrettyPrinter(indent=0)
 from tabulate import tabulate
 from tqdm.notebook import tqdm 
 import cv2
+import numpy as np
 from cowpy import cow
 from celluloid import Camera
 import colorama
@@ -46,7 +47,7 @@ def predict_FOVs(directory):
 
 
 def save_image(frame, i, img_format,save_directory,FOV,IMG_CHANNELS,channel):
-    if np.sum(frame) == 0:
+    if np.sum(frame) == 0: # Check if a frame is empty, as Nikon inserts empty frames when you have some channels being read ever n frames.
         pass
     else:
         if (img_format == "TIF") or (img_format == "TIFF"):
