@@ -11,7 +11,7 @@ from celluloid import Camera
 import colorama
 from termcolor import colored
 from joblib import Parallel, delayed, parallel_backend
-print("NEW VERSION")
+import yaml
 def greeting():
     cheese = cow.Turtle()
     msg = cheese.milk("BakshiLab FAST ND2 Extractor - By Georgeos Hardo")
@@ -64,6 +64,10 @@ def main_loop(directory,save_directory, joblib_workers):
         save_directory = save_directory + "/"
     # Get parameters of the experiment
     frames =  ND2Reader_SDK(directory)
+    metadata_dir = save_directory + "/../"
+    with open(metadata_dir+'metadata.yml', 'w') as outfile:
+        yaml.dump(frames.metadata, outfile, default_flow_style=False)
+
     IMG_HEIGHT = frames.metadata["tile_height"]
     IMG_WIDTH = frames.metadata["tile_width"]
     IMG_CHANNELS_COUNT = frames.metadata["plane_count"]
