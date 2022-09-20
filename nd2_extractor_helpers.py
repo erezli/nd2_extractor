@@ -72,30 +72,31 @@ def main_loop(directory,save_directory, joblib_workers):
     for x in tqdm(range(IMG_CHANNELS_COUNT), desc = "Getting experiment info - please wait"):
         IMG_CHANNELS.append(frames.metadata["plane_{}".format(x)]["name"])
     frames.close() 
-    num_FOVs = predict_FOVs(directory)
-    print(colored("I predict that there are {} FOVs in the experiment, is this correct? (y/n) ".format(num_FOVs), 'red', attrs=['bold']))
-    predict_correct = input()
-    if predict_correct == "y":
-        pass
-    elif predict_correct == "n":
-        num_FOVs = int(input("Enter the correct number of FOVs"))
-    print(colored("Do you want to predict the number of timepoints automatically? (y/n) ".format(num_FOVs), 'red', attrs=['bold']))
-    answer = input()
-    if answer == "n":
-        print("input number of timepoints")
-        num_t = input()
-        num_t = int(num_t)
-    else:
-        print(colored("Predicting number of timepoints in experiment. Please wait", "red", attrs=["bold"]))
-        num_t = predict_t(directory)
-        print(colored("I predict that there are {} timepoints in the experiment, is this correct? (y/n) ".format(num_t), 'red', attrs=['bold']))
+    num_FOVs = frames.sizes["m"]
+    #num_FOVs = predict_FOVs(directory)
+    #print(colored("I predict that there are {} FOVs in the experiment, is this correct? (y/n) ".format(num_FOVs), 'red', attrs=['bold']))
+    #predict_correct = input()
+    #if predict_correct == "y":
+    #    pass
+    #elif predict_correct == "n":
+    #    num_FOVs = int(input("Enter the correct number of FOVs"))
+    #print(colored("Do you want to predict the number of timepoints automatically? (y/n) ".format(num_FOVs), 'red', attrs=['bold']))
+    #answer = input()
+    #if answer == "n":
+    #    print("input number of timepoints")
+    #    num_t = input()
+    #    num_t = int(num_t)
+    #else:
+    #    print(colored("Predicting number of timepoints in experiment. Please wait", "red", attrs=["bold"]))
+    #    num_t = predict_t(directory)
+    #    print(colored("I predict that there are {} timepoints in the experiment, is this correct? (y/n) ".format(num_t), 'red', attrs=['bold']))
 
-    predict_correct = input()
-    if predict_correct == "y":
-        pass
-    elif predict_correct == "n":
-        num_t = int(input("Enter the correct number of FOVs"))
-
+    #predict_correct = input()
+    #if predict_correct == "y":
+    #    pass
+    #elif predict_correct == "n":
+    #    num_t = int(input("Enter the correct number of FOVs"))
+    num_t = frames.sizes["t"]
     assert int(SEQUENCES / num_FOVs) == num_t, "FOVs ({}) and timepoints ({}) do not match sequences ({}) in the experiment - check your inputs".format(num_FOVs,num_t,SEQUENCES)
     print(colored("Experiment parameters (please verify before proceeding with extraction".format(num_FOVs), 'blue', attrs=['bold']))
     print(tabulate([
