@@ -1,8 +1,8 @@
 # Setup
 
-Run the following commands 
+`pip install nd2-extractor`
 
-`pip install -r nd2_extractor_requirements.txt`
+For notebook use:
 
 `jupyter nbextension enable --py widgetsnbextension`
 
@@ -15,7 +15,7 @@ Then launch `nd2_extractor_interactive.ipynb` in a Jupyter notebook.
 ### From the command line
 
 ```
-$ python nd2_extractor.py --help
+$ nd2_extractor --help
     usage: nd2_extractor.py [-h] --ND2_directory ND2_DIRECTORY --save_directory SAVE_DIRECTORY --save_type SAVE_TYPE [--workers WORKERS]
 
     Extract and ND2 file to TIFF or PNG (zarr coming soon)

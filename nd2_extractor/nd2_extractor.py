@@ -124,9 +124,7 @@ def main_loop(directory,save_directory, joblib_workers, save_type = None):
                 Parallel(prefer="threads", n_jobs = joblib_workers)(delayed(save_image)(frames[i], i, img_format,save_directory,FOV,IMG_CHANNELS,channel) for i in tqdm(range(num_t), desc = "Frame progress in channel {}".format(IMG_CHANNELS[channel]), leave = False, position = 2) )
 
  
-
-
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Extract and ND2 file to TIFF or PNG (zarr coming soon)")
     parser.add_argument("--ND2_directory", type=str, nargs=1, help="The absolute directory of the ND2 file", required=True)
     parser.add_argument("--save_directory", type=str, nargs=1, help="The absolute directory of the extraction folder", required=True)
@@ -135,3 +133,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     main_loop(args.ND2_directory[0], args.save_directory[0], args.workers[0], args.save_type[0])
+
+
+if __name__ == "__main__":
+    main()
