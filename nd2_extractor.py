@@ -3,7 +3,7 @@ import pprint
 from pims import ND2Reader_SDK
 pp = pprint.PrettyPrinter(indent=0)
 from tabulate import tabulate
-from tqdm.notebook import tqdm 
+from tqdm.auto import tqdm 
 import cv2
 import numpy as np
 from cowpy import cow
@@ -12,6 +12,10 @@ import colorama
 from termcolor import colored
 from joblib import Parallel, delayed, parallel_backend
 import yaml
+import argparse
+
+
+
 def greeting():
     cheese = cow.Turtle()
     msg = cheese.milk("BakshiLab FAST ND2 Extractor - By Georgeos Hardo")
@@ -50,18 +54,22 @@ def save_image(frame, i, img_format,save_directory,FOV,IMG_CHANNELS,channel):
     if np.sum(frame) == 0: # Check if a frame is empty, as Nikon inserts empty frames when you have some channels being read ever n frames.
         pass
     else:
-        if (img_format == "TIF") or (img_format == "TIFF"):
+        if img_format.lower() in "tiff":
             cv2.imwrite(save_directory + 'xy{}_{}_T{}.tif'.format(str(FOV).zfill(3),IMG_CHANNELS[channel],str(i).zfill(4)), frame, [cv2.IMWRITE_TIFF_COMPRESSION, 1])
-        if img_format == "PNG":
+        if img_format.lower() in "png":
             cv2.imwrite(save_directory + 'xy{}_{}_T{}.png'.format(str(FOV).zfill(3),IMG_CHANNELS[channel],str(i).zfill(4)), frame)
         else:
-            cv2.imwrite(save_directory + 'xy{}_{}_T{}.tif'.format(str(FOV).zfill(3),IMG_CHANNELS[channel],str(i).zfill(4)), frame, [cv2.IMWRITE_TIFF_COMPRESSION, 1])
+            raise Exception("Invalid format, please choose either TIFF or PNG")
 
         
         
-def main_loop(directory,save_directory, joblib_workers):
+def main_loop(directory,save_directory, joblib_workers, save_type = None):
     if save_directory[-1] != "/":
         save_directory = save_directory + "/"
+    try:
+        os.mkdir(save_directory)
+    except:
+        pass
     # Get parameters of the experiment
     frames =  ND2Reader_SDK(directory)
     metadata_dir = save_directory + "/../"
@@ -77,29 +85,6 @@ def main_loop(directory,save_directory, joblib_workers):
         IMG_CHANNELS.append(frames.metadata["plane_{}".format(x)]["name"])
     frames.close() 
     num_FOVs = frames.sizes["m"]
-    #num_FOVs = predict_FOVs(directory)
-    #print(colored("I predict that there are {} FOVs in the experiment, is this correct? (y/n) ".format(num_FOVs), 'red', attrs=['bold']))
-    #predict_correct = input()
-    #if predict_correct == "y":
-    #    pass
-    #elif predict_correct == "n":
-    #    num_FOVs = int(input("Enter the correct number of FOVs"))
-    #print(colored("Do you want to predict the number of timepoints automatically? (y/n) ".format(num_FOVs), 'red', attrs=['bold']))
-    #answer = input()
-    #if answer == "n":
-    #    print("input number of timepoints")
-    #    num_t = input()
-    #    num_t = int(num_t)
-    #else:
-    #    print(colored("Predicting number of timepoints in experiment. Please wait", "red", attrs=["bold"]))
-    #    num_t = predict_t(directory)
-    #    print(colored("I predict that there are {} timepoints in the experiment, is this correct? (y/n) ".format(num_t), 'red', attrs=['bold']))
-
-    #predict_correct = input()
-    #if predict_correct == "y":
-    #    pass
-    #elif predict_correct == "n":
-    #    num_t = int(input("Enter the correct number of FOVs"))
     num_t = frames.sizes["t"]
     assert int(SEQUENCES / num_FOVs) == num_t, "FOVs ({}) and timepoints ({}) do not match sequences ({}) in the experiment - check your inputs".format(num_FOVs,num_t,SEQUENCES)
     print(colored("Experiment parameters (please verify before proceeding with extraction".format(num_FOVs), 'blue', attrs=['bold']))
@@ -112,10 +97,11 @@ def main_loop(directory,save_directory, joblib_workers):
         ['IMG_CHANNELS', IMG_CHANNELS]], headers=['Parameter', 'Value'], tablefmt='orgtbl'))
 
 
-
-    print(colored("Choose image format: (TIFF/PNG) ", 'red', attrs=['bold']))
-
-    img_format = input()
+    if save_type:
+        img_format = save_type
+    else:
+        print(colored("Choose image format: (TIFF/PNG) ", 'red', attrs=['bold']))
+        img_format = input()
 
 
     FOVs_list = list(range(num_FOVs))
@@ -138,3 +124,14 @@ def main_loop(directory,save_directory, joblib_workers):
                 Parallel(prefer="threads", n_jobs = joblib_workers)(delayed(save_image)(frames[i], i, img_format,save_directory,FOV,IMG_CHANNELS,channel) for i in tqdm(range(num_t), desc = "Frame progress in channel {}".format(IMG_CHANNELS[channel]), leave = False, position = 2) )
 
  
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Extract and ND2 file to TIFF or PNG (zarr coming soon)")
+    parser.add_argument("--ND2_directory", type=str, nargs=1, help="The absolute directory of the ND2 file", required=True)
+    parser.add_argument("--save_directory", type=str, nargs=1, help="The absolute directory of the extraction folder", required=True)
+    parser.add_argument("--save_type", type=str, nargs=1, help="The file type to save as (PNG/TIFF)", required=True)
+    parser.add_argument("--workers", type=int, nargs=1, help="The number of joblib workers to send to the extractor")
+
+    args = parser.parse_args()
+    main_loop(args.ND2_directory[0], args.save_directory[0], args.workers[0], args.save_type[0])
