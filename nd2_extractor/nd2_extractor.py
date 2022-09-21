@@ -158,7 +158,6 @@ def main():
     parser.add_argument("--t_stop", type=int, nargs=1, help="Extract up until this timepoint.")
     parser.add_argument("--fill_empty", action="store_const", const=True, default=False, help="If supplied, will fill empty frames with empty images, or skip saving them. Will be ignored if zarr chosen.")
     args = parser.parse_args()
-    print(args)
     main_loop(
         args.ND2_directory[0], 
         args.save_directory[0], 
