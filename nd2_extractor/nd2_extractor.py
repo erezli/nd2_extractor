@@ -131,7 +131,7 @@ def main_loop(directory,save_directory, joblib_workers, save_type = None, t_stop
             8: np.uint8
         }
 
-        compressor = Blosc(cname='zstd', clevel=6, shuffle=Blosc.BITSHUFFLE)
+        compressor = Blosc(cname='zstd', clevel=9, shuffle=Blosc.BITSHUFFLE)
         zarr_file = zarr.open(save_directory, mode='w', shape=zarr_dim, chunks=chunk_size, dtype=zarr_dtype[frames.metadata["bitsize_memory"]], compressor = compressor)
 
     with ND2Reader_SDK(directory) as frames:
@@ -155,9 +155,11 @@ def main():
     parser.add_argument("--save_directory", type=str, nargs=1, help="The absolute directory of the extraction folder.", required=True)
     parser.add_argument("--save_type", type=str, nargs=1, help="The file type to save as (PNG/TIFF/zarr).", required=True)
     parser.add_argument("--workers", type=int, default=50, nargs=1, help="The number of joblib workers to send to the extractor.")
-    parser.add_argument("--t_stop", type=int, nargs=1, help="Extract up until this timepoint.")
+    parser.add_argument("--t_stop", type=int, nargs=1, default=None, help="Extract up until this timepoint.")
     parser.add_argument("--fill_empty", action="store_const", const=True, default=False, help="If supplied, will fill empty frames with empty images, or skip saving them. Will be ignored if zarr chosen.")
     args = parser.parse_args()
+    if not args.t_stop:
+        args.t_stop = [args.t_stop]
     print(args)
     main_loop(  
         args.ND2_directory[0], 
