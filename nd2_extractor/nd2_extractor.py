@@ -47,7 +47,7 @@ def predict_FOVs(directory):
 
 
 def save_image(frame, i, img_format,save_directory,FOV,IMG_CHANNELS,channel, fill_empty=False):
-    if (np.sum(frame) == 0) and fill_empty: # Check if a frame is empty, as Nikon inserts empty frames when you have some channels being read ever n frames.
+    if (np.sum(frame) == 0) and not fill_empty: # Check if a frame is empty, as Nikon inserts empty frames when you have some channels being read ever n frames.
         pass
     else:
         if img_format.lower() in "tiff":
